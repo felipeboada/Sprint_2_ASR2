@@ -1,6 +1,16 @@
 from django.db import models
 
 
+
+class Warehouse(models.Model):  # representa una bodega física
+
+    name= models.CharField(max_length=100, unique=True)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    def __str__(self):
+        return self.name
+    
+
 class Product(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
@@ -9,38 +19,36 @@ class Product(models.Model):
 
 
 class Inventory(models.Model):
-    product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='inventory')
+    product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='inventories')
+
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, related_name='inventories')
+
     quantity = models.PositiveIntegerField(default=0)
+        
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        indexes = [
-            models.Index(fields=['product']),
-        ]
 
-    def __str__(self):
-        return f"{self.product.name}: {self.quantity}"
-
+        unique_together = [('product','warehouse')]
+        indexes = [models.Index(fields=['product','quantity']), models.Index(fields=['warehouse'])]
 
 class Order(models.Model):
-    PENDING = 'PENDING'
-    CONFIRMED = 'CONFIRMED'
-    REJECTED = 'REJECTED'
-    STATUS_CHOICES = [
-        (PENDING, 'Pending'),
-        (CONFIRMED, 'Confirmed'),
-        (REJECTED, 'Rejected'),
-    ]
+    PENDING='PENDING'; CONFIRMED='CONFIRMED'; REJECTED='REJECTED'
+
+    STATUS_CHOICES=[(PENDING,'Pending'),(CONFIRMED,'Confirmed'),(REJECTED,'Rejected')]
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='orders')
+
     units = models.PositiveIntegerField()
+
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=PENDING)
+
+    assigned_warehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        indexes = [
-            models.Index(fields=['product', 'status']),
-        ]
 
-    def __str__(self):
-        return f"Order #{self.id} {self.product.name} x{self.units} [{self.status}]"
+        indexes = [models.Index(fields=['product','status'])]
+        
+    def __str__(self): return f"Order #{self.id} {self.product.name} x{self.units} [{self.status}]" # representación legible de la orden
