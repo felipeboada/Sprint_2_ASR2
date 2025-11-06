@@ -1,0 +1,47 @@
+{
+	"info": {
+		"_postman_id": "782587a0-0c9d-4f4b-9424-e34a728dfaac",
+		"name": "Sprint3 API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41941643",
+		"_collection_link": "https://sstrns.postman.co/workspace/arquisoftsprin53~09e2a5e0-95ab-4ad0-b7a2-fa22a9f83105/collection/41941643-782587a0-0c9d-4f4b-9424-e34a728dfaac?action=share&source=collection_link&creator=41941643"
+	},
+	"item": [
+		{
+			"name": "prueba autoorder",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"product\": \"Monitor LED 24\\\"\",\r\n  \"units\": 3,\r\n  \"lat\": 3.4,\r\n  \"lon\": -76.53,\r\n  \"mainWarehouse\": \"Bodega Sur\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/auto_order/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auto_order",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
