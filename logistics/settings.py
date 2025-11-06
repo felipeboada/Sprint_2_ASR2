@@ -79,20 +79,14 @@ WSGI_APPLICATION = 'logistics.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'name_db',
-        'USER': 'user_db',
-        'PASSWORD': 'user_password',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'sprint3_db',
+        'USER': 'juanmorenoo',
+        'PASSWORD': 'Milola6462**',
         'HOST': 'localhost',
-        'PORT': '',
-        'CONN_MAX_AGE': 60,  # Keep DB connections open for pooling
-        'ATOMIC_REQUESTS': True,  # Wrap each request in a transaction
+        'PORT': '5432',
     }
 }
-
-
-# Password validation
-# https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
