@@ -75,6 +75,19 @@ def place_order_atomic(product_name: str, units: int, user_lat: float, user_lon:
             if attempt >= max_retries: raise
             continue
 
+
+
+    """
+ASR: Verificar disponibilidad en múltiples bodegas y asignar automáticamente la más cercana con stock.
+
+Comportamiento:
+- Verifica si hay stock en la bodega principal (si se indica).
+- Si no hay, busca automáticamente la bodega más cercana al usuario con unidades suficientes.
+- Si ninguna tiene stock, la orden queda REJECTED.
+- Todo se ejecuta de forma atómica y en menos de 5 segundos.
+"""
+
+
 def restock_atomic(product_name: str, units: int, warehouse_name:str) -> Inventory: #añade stock a una bodega específica
     if units<=0: raise ValueError("units must be > 0")
     product = create_or_get_product(product_name)
@@ -88,3 +101,5 @@ def restock_atomic(product_name: str, units: int, warehouse_name:str) -> Invento
 def get_inventory(product_name: str): #obtiene el inventario de un producto específico
     product = create_or_get_product(product_name)
     return Inventory.objects.select_related('product','warehouse').filter(product=product)
+
+
