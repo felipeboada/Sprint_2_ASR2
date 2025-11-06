@@ -36,41 +36,62 @@ def place_order_atomic(product_name: str, units: int, user_lat: float, user_lon:
     product = create_or_get_product(product_name)
 
     for attempt in range(1, max_retries+1):
+
         try:
+
             with transaction.atomic():
+
                 order = Order.objects.create(product=product, units=units)
 
+
                 # 1) si se especifica bodega principal, intenta ahí
+
                 if main_warehouse_name:
                     try:
                         mw = Warehouse.objects.get(name=main_warehouse_name)
+
                         inv = (Inventory.objects.select_for_update().get(product=product, warehouse=mw))
+
                         if inv.quantity >= units:
+
                             Inventory.objects.filter(pk=inv.pk, quantity__gte=units)\
                                 .update(quantity=F('quantity')-units)
+                            
                             order.status = Order.CONFIRMED
                             order.assigned_warehouse = mw
                             order.save(update_fields=['status','assigned_warehouse'])
+                            
                             return order, True
                     except (Warehouse.DoesNotExist, Inventory.DoesNotExist):
                         pass
 
                 # 2) alternativa: bodega más cercana con stock
+                
                 alt = find_nearest_with_stock(product, units, user_lat, user_lon)
+
                 if alt:
+
                     alt = Inventory.objects.select_for_update().get(pk=alt.pk)
+                    
                     if alt.quantity >= units:
+
                         Inventory.objects.filter(pk=alt.pk, quantity__gte=units)\
                             .update(quantity=F('quantity')-units)
+                        
                         order.status = Order.CONFIRMED
                         order.assigned_warehouse = alt.warehouse
                         order.save(update_fields=['status','assigned_warehouse'])
+                        
                         return order, True
+                        
 
                 # 3) sin stock
+                
                 order.status = Order.REJECTED
                 order.save(update_fields=['status'])
                 return order, False
+            
+
         except DatabaseError:
             if attempt >= max_retries: raise
             continue
