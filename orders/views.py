@@ -1,12 +1,11 @@
 # orders/views.py
-import json
+import json, time
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
 from .logic import get_inventory, restock_atomic, place_order_atomic
 from .serializers import InventorySerializer, OrderSerializer
-from django.http import JsonResponse
-from .logic import place_order_atomic
-from django.views.decorators.csrf import csrf_exempt
+
 
 @require_http_methods(["GET"])
 def inventory_detail(request, product_name: str):
@@ -16,6 +15,7 @@ def inventory_detail(request, product_name: str):
     data = InventorySerializer(qs, many=True).data
 
     return JsonResponse(data, safe=False, status=200)
+
 
 @require_http_methods(["POST"])
 def inventory_restock(request, product_name: str):
@@ -30,6 +30,7 @@ def inventory_restock(request, product_name: str):
     inv = restock_atomic(product_name, units, warehouse)
     from .serializers import InventorySerializer
     return JsonResponse(InventorySerializer(inv).data, status=200)
+
 
 @require_http_methods(["POST"])
 def place_order(request, product_name: str):
@@ -49,44 +50,45 @@ def place_order(request, product_name: str):
 
 
 @csrf_exempt
-@require_http_methods(["GET", "POST"])
+@require_http_methods(["POST"])
 def create_order_view(request):
     """
-    Vista para crear una orden automática que verifica disponibilidad
-    y asigna la bodega más cercana con stock.
-    Permite GET (pruebas rápidas por URL) y POST (con JSON desde Postman).
+    Crea una orden automática verificando disponibilidad en todas las bodegas.
+    Asigna la más cercana con stock y actualiza el estado.
+    Cumple con el ASR: ejecución < 5s y reasignación inteligente.
     """
 
-    try:
-        if request.method == "POST":
-            payload = json.loads(request.body.decode("utf-8")) if request.body else {}
-            product_name = payload.get("product", "Mouse inalámbrico")
-            units = int(payload.get("units", 3))
-            user_lat = float(payload.get("lat", 4.6097))
-            user_lon = float(payload.get("lon", -74.0817))
-            main_warehouse = payload.get("main", None)
-        else:
-            # Permite probar desde el navegador con parámetros GET
-            product_name = request.GET.get("product", "Mouse inalámbrico")
-            units = int(request.GET.get("units", 3))
-            user_lat = float(request.GET.get("lat", 4.6097))
-            user_lon = float(request.GET.get("lon", -74.0817))
-            main_warehouse = request.GET.get("main", None)
+    start_time = time.time()
 
-        order, confirmed = place_order_atomic(
-            product_name, units, user_lat, user_lon, main_warehouse
+    try:
+        payload = json.loads(request.body.decode("utf-8")) if request.body else {}
+        product_name = payload["product"]
+        units = int(payload["units"])
+        user_lat = float(payload["lat"])
+        user_lon = float(payload["lon"])
+        main_warehouse_name = payload.get("mainWarehouse")
+    except (KeyError, ValueError, json.JSONDecodeError):
+        return HttpResponseBadRequest(
+            'Payload inválido. Ejemplo: {"product": "Monitor LED 24\"", "units": 5, "lat": 4.6, "lon": -74.08, "mainWarehouse": "Bodega Sur"}'
         )
 
-        data = {
-            "order_id": order.id,
-            "product": order.product.name,
-            "units": order.units,
-            "status": order.status,
-            "assigned_warehouse": order.assigned_warehouse.name if order.assigned_warehouse else None,
-            "confirmed": confirmed,
-        }
+    order, confirmed = place_order_atomic(
+        product_name=product_name,
+        units=units,
+        user_lat=user_lat,
+        user_lon=user_lon,
+        main_warehouse_name=main_warehouse_name
+    )
 
-        return JsonResponse(data, status=200)
+    elapsed = round(time.time() - start_time, 3)
 
-    except Exception as e:
-        return HttpResponseBadRequest(str(e))
+    return JsonResponse({
+        "order_id": order.id,
+        "product": order.product.name,
+        "units": order.units,
+        "status": order.status,
+        "assigned_warehouse": order.assigned_warehouse.name if order.assigned_warehouse else None,
+        "confirmed": confirmed,
+        "execution_time_seconds": elapsed,
+        "meets_performance_ASR": elapsed <= 5.0
+    }, status=200 if confirmed else 409)
