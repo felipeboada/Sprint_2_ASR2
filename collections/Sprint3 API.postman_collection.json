@@ -8,13 +8,79 @@
 	},
 	"item": [
 		{
-			"name": "prueba autoorder",
+			"name": "crearOrden",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"product\": \"Monitor LED 24\\\"\",\r\n  \"units\": 3,\r\n  \"lat\": 3.4,\r\n  \"lon\": -76.53,\r\n  \"mainWarehouse\": \"Bodega Sur\"\r\n}\r\n",
+					"raw": "{\r\n  \"product\": \"Botas dieléctricas Provesi 10 kV\",\r\n  \"units\": 3,\r\n  \"lat\": 4.62,\r\n  \"lon\": -74.08,\r\n  \"mainWarehouse\": \"Bodega Sur\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/auto_order/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auto_order",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ejemploDOS",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"product\": \"Botas dieléctricas Provesi 10 kV\",\r\n  \"units\": 2,\r\n  \"lat\": 4.75,\r\n  \"lon\": -74.03,\r\n  \"mainwarehouse\": \"Bodega Centro\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/auto_order/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"auto_order",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ejemploTres",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"product\": \"Botas dieléctricas Provesi 10 kV\",\r\n  \"units\": 1,\r\n  \"lat\": 4.62,\r\n  \"lon\": -74.08,\r\n  \"mainwarehouse\": \"Bodega Sur\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"

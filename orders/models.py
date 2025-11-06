@@ -19,7 +19,9 @@ class Product(models.Model):
 
 
 class Inventory(models.Model):
-    product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='inventories')
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='inventories')
+
 
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, related_name='inventories', null=True, blank=True)
 
