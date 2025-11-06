@@ -11,4 +11,7 @@ class Measurement(models.Model):
     product = models.ForeignKey('orders.Product', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return '%s %s' % (self.value, self.unit)
+
+        product_name = self.product.name if self.product else "N/A"
+        return f"{product_name} - {self.value} {self.unit}"
+    
