@@ -2,23 +2,155 @@
 {% block content %}
 
 <style>
-    .form-container { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 15px; padding: 40px; margin: 20px auto; max-width: 600px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    .form-title { color: #1565c0; font-size: 2em; text-align: center; margin-bottom: 30px; font-weight: 600; }
-    .btn-container { display: flex; justify-content: center; gap: 15px; margin-top: 30px; }
-    .save-btn { background: linear-gradient(45deg, #007bff, #00b4d8); border: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; color: white; }
-    .back-btn { background: linear-gradient(45deg, #6c757d, #495057); border: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; color: white; }
+    .form-container { 
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+        border-radius: 15px; 
+        padding: 40px; 
+        margin: 20px auto; 
+        max-width: 650px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    }
+    .form-title { 
+        color: #1565c0; 
+        font-size: 2em; 
+        text-align: center; 
+        margin-bottom: 10px; 
+        font-weight: 600; 
+    }
+    .form-subtitle { 
+        text-align: center; 
+        color: #6c757d; 
+        margin-bottom: 30px; 
+        font-size: 0.95em; 
+        line-height: 1.5;
+    }
+    .btn-container { 
+        display: flex; 
+        justify-content: center; 
+        gap: 15px; 
+        margin-top: 30px; 
+    }
+    .save-btn { 
+        background: linear-gradient(45deg, #28a745, #20c997); 
+        border: none; 
+        padding: 14px 35px; 
+        border-radius: 25px; 
+        font-weight: bold; 
+        color: white;
+        transition: transform 0.2s;
+    }
+    .save-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    }
+    .back-btn { 
+        background: linear-gradient(45deg, #6c757d, #495057); 
+        border: none; 
+        padding: 14px 35px; 
+        border-radius: 25px; 
+        font-weight: bold; 
+        color: white; 
+    }
+    .form-group { 
+        margin-bottom: 25px; 
+    }
+    .form-group label { 
+        font-weight: 600; 
+        color: #495057; 
+        display: block; 
+        margin-bottom: 8px;
+        font-size: 1.05em;
+    }
+    .form-group input, .form-group select { 
+        width: 100%; 
+        padding: 12px 15px; 
+        border: 2px solid #dee2e6; 
+        border-radius: 8px; 
+        font-size: 1em;
+        transition: border-color 0.3s;
+    }
+    .form-group input:focus, .form-group select:focus { 
+        border-color: #007bff; 
+        outline: none;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+    .help-text { 
+        font-size: 0.85em; 
+        color: #6c757d; 
+        margin-top: 5px; 
+        font-style: italic;
+    }
+    .info-box { 
+        background: #d1ecf1; 
+        padding: 18px; 
+        border-radius: 10px; 
+        margin-bottom: 25px; 
+        border-left: 4px solid #0c5460;
+    }
+    .info-box strong {
+        color: #0c5460;
+        display: block;
+        margin-bottom: 8px;
+    }
+    .info-box ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    .info-box li {
+        color: #0c5460;
+        font-size: 0.9em;
+        margin-bottom: 3px;
+    }
 </style>
 
 <div class="form-container">
-    <h2 class="form-title">🧾 Create Order</h2>
+    <h2 class="form-title">🛒 Realizar Pedido</h2>
+    <p class="form-subtitle">
+        Selecciona el producto, cantidad y tu zona de entrega.<br>
+        El sistema asignará automáticamente la bodega más cercana con stock disponible.
+    </p>
+    
+    <div class="info-box">
+        <strong>📍 Zonas de entrega disponibles:</strong>
+        <ul>
+            <li><strong>Zona Norte:</strong> Usaquén, Chapinero, Suba</li>
+            <li><strong>Zona Centro:</strong> Teusaquillo, Santa Fe, Candelaria</li>
+            <li><strong>Zona Sur:</strong> Kennedy, Bosa, Tunjuelito</li>
+            <li><strong>Zona Occidente:</strong> Fontibón, Engativá</li>
+            <li><strong>Zona Oriente:</strong> San Cristóbal, Usme</li>
+        </ul>
+    </div>
+    
     <form method="POST">
         {% csrf_token %}
         <div class="form-content">
-            {{ form.as_p }}
+            <div class="form-group">
+                <label for="{{ form.variable.id_for_label }}">
+                    📦 {{ form.variable.label }}
+                </label>
+                {{ form.variable }}
+                <div class="help-text">{{ form.variable.help_text }}</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.units.id_for_label }}">
+                    🔢 {{ form.units.label }}
+                </label>
+                {{ form.units }}
+                <div class="help-text">{{ form.units.help_text }}</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.delivery_zone.id_for_label }}">
+                    🏘️ {{ form.delivery_zone.label }}
+                </label>
+                {{ form.delivery_zone }}
+                <div class="help-text">{{ form.delivery_zone.help_text }}</div>
+            </div>
         </div>
         <div class="btn-container">
-            <button type="submit" class="btn save-btn">📦 Place Order</button>
-            <button type="button" class="btn back-btn" onClick=" window.location.href='/stock' ">📋 Back to Inventory</button>
+            <button type="submit" class="btn save-btn">✓ Confirmar Pedido</button>
+            <button type="button" class="btn back-btn" onClick="window.location.href='/'">← Volver</button>
         </div>
     </form>
 </div>

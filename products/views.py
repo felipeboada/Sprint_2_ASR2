@@ -4,7 +4,10 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .forms import VariableForm
 from .logic.variable_logic import get_variables, create_variable
+from django.contrib.auth.decorators import login_required
+from authentication.decorators import operario_required
 
+@login_required
 def variable_list(request):
     variables = get_variables()
     context = {
@@ -12,6 +15,7 @@ def variable_list(request):
     }
     return render(request, 'Products/variables.html', context)
 
+@operario_required
 def variable_create(request):
     if request.method == 'POST':
         form = VariableForm(request.POST)

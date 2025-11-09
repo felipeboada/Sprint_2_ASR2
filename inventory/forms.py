@@ -23,5 +23,28 @@ class MeasurementForm(forms.ModelForm):
 
 
 class OrderForm(forms.Form):
-    variable = forms.ModelChoiceField(queryset=Variable.objects.all(), label='Producto')
-    units = forms.IntegerField(min_value=1, label='Cantidad')
+    # Zonas de entrega predefinidas con sus coordenadas
+    DELIVERY_ZONES = [
+        ('norte', 'Zona Norte - Usaquén, Chapinero, Suba'),
+        ('centro', 'Zona Centro - Teusaquillo, Santa Fe, Candelaria'),
+        ('sur', 'Zona Sur - Kennedy, Bosa, Tunjuelito'),
+        ('occidente', 'Zona Occidente - Fontibón, Engativá'),
+        ('oriente', 'Zona Oriente - San Cristóbal, Usme'),
+    ]
+    
+    variable = forms.ModelChoiceField(
+        queryset=Variable.objects.all(), 
+        label='Producto',
+        help_text='Selecciona el producto que deseas ordenar'
+    )
+    units = forms.IntegerField(
+        min_value=1, 
+        label='Cantidad',
+        help_text='Número de unidades a solicitar'
+    )
+    delivery_zone = forms.ChoiceField(
+        choices=DELIVERY_ZONES,
+        label='Zona de Entrega',
+        initial='centro',
+        help_text='Selecciona la zona donde deseas recibir tu pedido'
+    )

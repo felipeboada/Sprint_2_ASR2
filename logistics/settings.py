@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'authentication',
     'inventory',
     'products',
     'orders',
@@ -79,14 +80,22 @@ WSGI_APPLICATION = 'logistics.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'sprint3_db',
-        'USER': 'juanmorenoo',
-        'PASSWORD': 'Milola6462**',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+# Configuración de PostgreSQL para producción (comentada)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'sprint3_db',
+#         'USER': 'juanmorenoo',
+#         'PASSWORD': 'Milola6462**',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -131,3 +140,11 @@ MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'static', 'media')
 STATICFILES_DIRS = (
     os.path.join(PROJECT_ROOT, 'static'),
 )
+
+# Configuración del modelo de usuario personalizado
+AUTH_USER_MODEL = 'authentication.User'
+
+# Configuración de autenticación
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'
