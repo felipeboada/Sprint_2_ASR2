@@ -1,0 +1,7 @@
+Django==5.2.5
+psycopg2-binary==2.9.10
+# API and concurrency-friendly stack
+djangorestframework==3.15.2
+uvicorn==0.30.6
+# uvloop/httptools omitted for Windows compatibility
+django-redis==5.4.0
