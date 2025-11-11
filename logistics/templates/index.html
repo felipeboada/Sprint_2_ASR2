@@ -2,92 +2,150 @@
 {% block content %}
 
 <style>
-    .welcome-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 400px;
-        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-        border-radius: 15px;
-        margin: 20px 0;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-
-    .welcome-title {
-        color: #1565c0;
-        font-size: 2.5em;
-        margin-bottom: 30px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .truck-container {
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 60px 40px;
+        margin: 30px 0;
+        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
         position: relative;
-        margin-top: 20px;
+        overflow: hidden;
+        color: white;
     }
-
-    /* Camión principal */
-    .truck {
-        width: 200px;
-        height: 80px;
-        background: #ff6b35;
-        border-radius: 10px 10px 5px 5px;
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .hero-content {
         position: relative;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        z-index: 1;
+        text-align: center;
     }
-
-    /* Cabina del camión */
+    
+    .hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        animation: fadeInDown 1s ease;
+    }
+    
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
+        opacity: 0.95;
+        margin-bottom: 40px;
+        animation: fadeInUp 1s ease 0.3s both;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .truck-animation {
+        width: 250px;
+        height: 120px;
+        margin: 30px auto;
+        position: relative;
+        animation: fadeIn 1s ease 0.6s both;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    .truck-body {
+        width: 180px;
+        height: 70px;
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        border-radius: 12px;
+        position: absolute;
+        bottom: 25px;
+        left: 35px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        animation: bounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0) translateX(0); }
+        50% { transform: translateY(-8px) translateX(10px); }
+    }
+    
     .truck-cabin {
-        width: 60px;
-        height: 50px;
-        background: #e63946;
-        border-radius: 8px 8px 0 0;
+        width: 70px;
+        height: 55px;
+        background: linear-gradient(135deg, #ee5a6f 0%, #d4394b 100%);
+        border-radius: 12px 12px 0 0;
+        position: absolute;
+        left: 0;
+        top: -40px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    
+    .windshield {
+        width: 50px;
+        height: 30px;
+        background: rgba(135, 206, 235, 0.8);
+        border-radius: 6px;
         position: absolute;
         left: 10px;
-        top: -30px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        top: 8px;
+        border: 3px solid #fff;
+        box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
     }
-
-    /* Parabrisas */
-    .windshield {
-        width: 40px;
-        height: 25px;
-        background: #87ceeb;
-        border-radius: 3px;
-        position: absolute;
-        left: 8px;
-        top: 5px;
-        border: 2px solid #4682b4;
-    }
-
-    /* Ruedas */
+    
     .wheel {
-        width: 30px;
-        height: 30px;
+        width: 38px;
+        height: 38px;
         background: #2c3e50;
         border-radius: 50%;
         position: absolute;
-        bottom: -15px;
-        border: 3px solid #34495e;
+        bottom: -19px;
+        border: 4px solid #34495e;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        animation: spin 1s linear infinite;
     }
-
-    .wheel-front {
-        left: 20px;
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
     }
-
-    .wheel-back1 {
-        right: 40px;
-    }
-
-    .wheel-back2 {
-        right: 10px;
-    }
-
-    /* Llanta interior */
+    
     .wheel::after {
         content: '';
-        width: 10px;
-        height: 10px;
+        width: 12px;
+        height: 12px;
         background: #7f8c8d;
         border-radius: 50%;
         position: absolute;
@@ -95,81 +153,342 @@
         left: 50%;
         transform: translate(-50%, -50%);
     }
-
-    /* Puerta del camión */
-    .truck-door {
-        width: 35px;
-        height: 35px;
-        background: #d63031;
-        position: absolute;
-        right: 15px;
-        top: 25px;
-        border-radius: 3px;
-        border: 2px solid #a71e22;
-    }
-
-    /* Manija de la puerta */
-    .door-handle {
-        width: 3px;
-        height: 8px;
-        background: #2c3e50;
-        position: absolute;
-        right: 5px;
-        top: 50%;
-        transform: translateY(-50%);
-        border-radius: 2px;
-    }
-
-    /* Luces */
+    
+    .wheel-front { left: 20px; }
+    .wheel-back1 { right: 45px; }
+    .wheel-back2 { right: 10px; }
+    
     .headlight {
-        width: 8px;
-        height: 8px;
-        background: #f1c40f;
+        width: 10px;
+        height: 10px;
+        background: #fff;
         border-radius: 50%;
         position: absolute;
-        left: 2px;
-        top: 15px;
-        box-shadow: 0 0 5px #f39c12;
+        left: 5px;
+        top: 20px;
+        box-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700;
+        animation: blink 2s ease-in-out infinite;
     }
-
-    /* Animación de movimiento */
-    .truck-container {
+    
+    @keyframes blink {
+        0%, 49%, 51%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+    
+    .smoke {
+        width: 20px;
+        height: 20px;
+        background: rgba(200, 200, 200, 0.5);
+        border-radius: 50%;
+        position: absolute;
+        right: -10px;
+        bottom: 30px;
+        animation: smokeRise 3s ease-out infinite;
+    }
+    
+    @keyframes smokeRise {
+        0% {
+            transform: translateY(0) translateX(0) scale(0.8);
+            opacity: 0.7;
+        }
+        100% {
+            transform: translateY(-50px) translateX(-30px) scale(1.5);
+            opacity: 0;
+        }
+    }
+    
+    .feature-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin: 40px 0;
+    }
+    
+    .feature-card {
+        background: white;
+        border-radius: 20px;
+        padding: 35px 25px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-align: center;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        border-color: #667eea;
+    }
+    
+    .feature-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .feature-icon {
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         animation: float 3s ease-in-out infinite;
     }
-
+    
     @keyframes float {
         0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(-5px); }
+        50% { transform: translateY(-10px); }
     }
-
-    .subtitle {
-        color: #1565c0;
-        font-size: 1.2em;
+    
+    .feature-card:nth-child(2) .feature-icon {
+        animation-delay: 0.3s;
+    }
+    
+    .feature-card:nth-child(3) .feature-icon {
+        animation-delay: 0.6s;
+    }
+    
+    .feature-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 15px;
+    }
+    
+    .feature-description {
+        color: #7f8c8d;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    
+    .stats-section {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        margin: 40px 0;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
         margin-top: 30px;
+    }
+    
+    .stat-item {
         text-align: center;
-        font-weight: 300;
+        padding: 20px;
+        border-radius: 15px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 20%);
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-item:hover {
+        transform: scale(1.05);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 10px;
+    }
+    
+    .stat-label {
+        color: #7f8c8d;
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+    
+    .cta-section {
+        text-align: center;
+        margin: 50px 0;
+    }
+    
+    .cta-button {
+        display: inline-block;
+        padding: 18px 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-decoration: none;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .cta-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: left 0.5s ease;
+    }
+    
+    .cta-button:hover::before {
+        left: 100%;
+    }
+    
+    .cta-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        text-decoration: none;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1rem;
+        }
+        
+        .feature-cards {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
-<div class="welcome-container">
-    <h1 class="welcome-title">¡Bienvenido al Sistema de Logística!</h1>
-    
-    <div class="truck-container">
-        <div class="truck">
-            <div class="truck-cabin">
-                <div class="windshield"></div>
-                <div class="headlight"></div>
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">
+            <i class="fas fa-star"></i>
+            Bienvenido a LogiSmart
+            <i class="fas fa-star"></i>
+        </h1>
+        <p class="hero-subtitle">
+            Tu solución inteligente para gestión logística y control de inventarios
+        </p>
+        
+        <div class="truck-animation">
+            <div class="truck-body">
+                <div class="truck-cabin">
+                    <div class="windshield"></div>
+                    <div class="headlight"></div>
+                </div>
+                <div class="wheel wheel-front"></div>
+                <div class="wheel wheel-back1"></div>
+                <div class="wheel wheel-back2"></div>
+                <div class="smoke"></div>
             </div>
-            <div class="truck-door">
-                <div class="door-handle"></div>
-            </div>
-            <div class="wheel wheel-front"></div>
-            <div class="wheel wheel-back1"></div>
-            <div class="wheel wheel-back2"></div>
         </div>
     </div>
-    
-    <p class="subtitle">Gestiona tus productos y controla tu stock de manera eficiente</p>
 </div>
+
+<div class="feature-cards">
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-box-open"></i>
+        </div>
+        <h3 class="feature-title">Gestión de Inventario</h3>
+        <p class="feature-description">
+            Control total de tu stock en tiempo real. Visualiza, actualiza y optimiza tu inventario con facilidad.
+        </p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-shipping-fast"></i>
+        </div>
+        <h3 class="feature-title">Pedidos Eficientes</h3>
+        <p class="feature-description">
+            Procesamiento automático de pedidos con asignación inteligente de bodegas según ubicación.
+        </p>
+    </div>
+    
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <h3 class="feature-title">Análisis en Tiempo Real</h3>
+        <p class="feature-description">
+            Monitorea el rendimiento de tu operación con estadísticas actualizadas y reportes detallados.
+        </p>
+    </div>
+</div>
+
+{% if user.is_authenticated %}
+<div class="stats-section">
+    <h2 style="text-align: center; color: #2c3e50; margin-bottom: 10px;">
+        <i class="fas fa-chart-bar"></i> Panel de Control
+    </h2>
+    <p style="text-align: center; color: #7f8c8d; margin-bottom: 30px;">
+        Vista rápida de tu operación logística
+    </p>
+    
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-number">
+                <i class="fas fa-boxes"></i>
+                <span>8</span>
+            </div>
+            <div class="stat-label">Productos Disponibles</div>
+        </div>
+        
+        <div class="stat-item">
+            <div class="stat-number">
+                <i class="fas fa-warehouse"></i>
+                <span>3</span>
+            </div>
+            <div class="stat-label">Bodegas Activas</div>
+        </div>
+        
+        <div class="stat-item">
+            <div class="stat-number">
+                <i class="fas fa-clipboard-check"></i>
+                <span>24/7</span>
+            </div>
+            <div class="stat-label">Disponibilidad</div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section">
+    {% if user.is_cliente %}
+        <a href="/ordercreate/" class="cta-button">
+            <i class="fas fa-shopping-cart"></i> Realizar un Pedido Ahora
+        </a>
+    {% elif user.is_operario %}
+        <a href="/stock/" class="cta-button">
+            <i class="fas fa-warehouse"></i> Ver Inventario
+        </a>
+    {% elif user.is_admin %}
+        <a href="/admin/" class="cta-button">
+            <i class="fas fa-cog"></i> Ir al Panel de Administración
+        </a>
+    {% endif %}
+</div>
+{% else %}
+<div class="cta-section">
+    <a href="/login/" class="cta-button">
+        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+    </a>
+</div>
+{% endif %}
 
 {% endblock %}

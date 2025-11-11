@@ -2,56 +2,476 @@
 {% block content %}
 
 <style>
-    .page-container {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        border-radius: 15px;
-        padding: 30px;
-        margin: 20px 0;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    .inventory-container {
+        animation: fadeIn 0.6s ease;
     }
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #1565c0; }
-    .page-title { color: #1565c0; font-size: 2em; margin: 0; font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
-    .actions { display: flex; gap: 10px; }
-    .create-btn { background: linear-gradient(45deg, #28a745, #20c997); border: none; padding: 12px 20px; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3); transition: all 0.3s ease; }
-    .order-btn { background: linear-gradient(45deg, #007bff, #00b4d8); border: none; padding: 12px 20px; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3); transition: all 0.3s ease; }
-    .table-container { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-    .table thead th { background: linear-gradient(45deg, #1565c0, #1976d2); color: white; font-weight: bold; text-align: center; padding: 15px; border: none; }
-    .table tbody td { padding: 12px 15px; text-align: center; vertical-align: middle; }
-    .back-btn { background: linear-gradient(45deg, #6c757d, #495057); border: none; padding: 12px 30px; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3); transition: all 0.3s ease; margin-top: 20px; }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 40px;
+        box-shadow: 0 15px 40px rgba(245, 87, 108, 0.3);
+        color: white;
+    }
+    
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .title-section {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .warehouse-icon {
+        font-size: 3.5rem;
+        animation: swing 2s ease-in-out infinite;
+    }
+    
+    @keyframes swing {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-5deg); }
+        75% { transform: rotate(5deg); }
+    }
+    
+    .title-text h1 {
+        font-size: 2.5rem;
+        margin: 0;
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .title-text p {
+        margin: 10px 0 0 0;
+        opacity: 0.95;
+        font-size: 1.1rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-action {
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1rem;
+        border: none;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: white;
+    }
+    
+    .btn-restock {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .btn-order {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .btn-action:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        color: white;
+    }
+    
+    .stats-overview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(245, 87, 108, 0.2);
+    }
+    
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+    
+    .stat-label {
+        color: #7f8c8d;
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+    
+    .inventory-table-container {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .table-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px 30px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .table-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .table {
+        margin: 0;
+    }
+    
+    .table thead th {
+        background: #f8f9fa;
+        color: #2c3e50;
+        font-weight: 700;
+        text-align: center;
+        padding: 20px 15px;
+        border: none;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .table tbody tr:hover {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 20%);
+        transform: scale(1.01);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    
+    .table tbody td {
+        padding: 20px 15px;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 1rem;
+    }
+    
+    .product-name-cell {
+        font-weight: 600;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .product-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+    
+    .quantity-badge {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        min-width: 80px;
+    }
+    
+    .quantity-low {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    }
+    
+    .quantity-medium {
+        background: linear-gradient(135deg, #ffd89b 0%, #ffb347 100%);
+    }
+    
+    .quantity-high {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .date-cell {
+        color: #7f8c8d;
+        font-size: 0.95rem;
+    }
+    
+    .back-btn-container {
+        text-align: center;
+        margin: 40px 0;
+    }
+    
+    .back-btn {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        border: none;
+        padding: 15px 40px;
+        border-radius: 50px;
+        font-weight: 700;
+        color: white;
+        box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3);
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.05rem;
+    }
+    
+    .back-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(108, 117, 125, 0.4);
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .empty-icon {
+        font-size: 5rem;
+        color: #c3cfe2;
+        margin-bottom: 20px;
+    }
+    
+    .empty-title {
+        font-size: 1.8rem;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .empty-text {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .header-content {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .title-section {
+            flex-direction: column;
+        }
+        
+        .title-text h1 {
+            font-size: 2rem;
+        }
+        
+        .action-buttons {
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .btn-action {
+            flex: 1;
+        }
+        
+        .table thead {
+            display: none;
+        }
+        
+        .table tbody tr {
+            display: block;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .table tbody td {
+            display: block;
+            text-align: right;
+            padding: 15px;
+            border: none;
+        }
+        
+        .table tbody td::before {
+            content: attr(data-label);
+            float: left;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .product-name-cell {
+            justify-content: flex-end;
+        }
+    }
 </style>
 
-<div class="page-container">
+<div class="inventory-container">
     <div class="page-header">
-        <h2 class="page-title">📦 Inventario</h2>
-        <div class="actions">
-            <button type="button" class="btn btn-success create-btn" onClick=" window.location.href='/stockcreate' ">+ Restock</button>
-            <button type="button" class="btn btn-primary order-btn" onClick=" window.location.href='/ordercreate' ">+ Crear Orden</button>
+        <div class="header-content">
+            <div class="title-section">
+                <div class="warehouse-icon">
+                    <i class="fas fa-warehouse"></i>
+                </div>
+                <div class="title-text">
+                    <h1>Gestión de Inventario</h1>
+                    <p>Control y seguimiento de stock en tiempo real</p>
+                </div>
+            </div>
+            <div class="action-buttons">
+                {% if user.is_operario or user.is_admin %}
+                <button type="button" class="btn btn-restock" onclick="window.location.href='/stockcreate'">
+                    <i class="fas fa-boxes"></i>
+                    <span>Reabastecer</span>
+                </button>
+                {% endif %}
+                {% if user.is_cliente or user.is_admin %}
+                <button type="button" class="btn btn-order" onclick="window.location.href='/ordercreate'">
+                    <i class="fas fa-cart-plus"></i>
+                    <span>Nuevo Pedido</span>
+                </button>
+                {% endif %}
+            </div>
         </div>
     </div>
 
-    <div class="table-container">
+    <div class="stats-overview">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-box-open"></i>
+            </div>
+            <div class="stat-value">{{ inventories|length }}</div>
+            <div class="stat-label">Registros de Inventario</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="stat-value">3</div>
+            <div class="stat-label">Bodegas Activas</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-value">100%</div>
+            <div class="stat-label">Disponibilidad</div>
+        </div>
+    </div>
+
+    {% if inventories %}
+    <div class="inventory-table-container">
+        <div class="table-header">
+            <i class="fas fa-clipboard-list"></i>
+            <h3>Detalles del Inventario</h3>
+        </div>
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Actualizado</th>
+                    <th><i class="fas fa-tag"></i> Producto</th>
+                    <th><i class="fas fa-boxes"></i> Cantidad</th>
+                    <th><i class="fas fa-clock"></i> Última Actualización</th>
                 </tr>
             </thead>
             <tbody>
                 {% for inv in inventories %}
                 <tr>
-                    <td><strong>{{ inv.product.name }}</strong></td>
-                    <td><span class="badge badge-info">{{ inv.quantity }}</span></td>
-                    <td>{{ inv.updated_at|date:"d/m/Y H:i" }}</td>
+                    <td data-label="Producto">
+                        <div class="product-name-cell">
+                            <div class="product-icon">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <span>{{ inv.product.name }}</span>
+                        </div>
+                    </td>
+                    <td data-label="Cantidad">
+                        <span class="quantity-badge {% if inv.quantity < 100 %}quantity-low{% elif inv.quantity < 500 %}quantity-medium{% else %}quantity-high{% endif %}">
+                            {{ inv.quantity }}
+                        </span>
+                    </td>
+                    <td data-label="Actualización" class="date-cell">
+                        <i class="far fa-calendar-alt"></i>
+                        {{ inv.updated_at|date:"d/m/Y" }}
+                        <br>
+                        <i class="far fa-clock"></i>
+                        {{ inv.updated_at|date:"H:i" }}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-boxes"></i>
+        </div>
+        <h2 class="empty-title">No hay inventario disponible</h2>
+        <p class="empty-text">Comienza agregando productos a tu inventario</p>
+    </div>
+    {% endif %}
 
-    <div style="text-align:center;">
-        <button type="button" class="btn back-btn" onClick=" window.location.href='/' ">🏠 Volver al Inicio</button>
+    <div class="back-btn-container">
+        <button type="button" class="btn back-btn" onclick="window.location.href='/'">
+            <i class="fas fa-arrow-left"></i>
+            <span>Volver al Inicio</span>
+        </button>
     </div>
 </div>
 

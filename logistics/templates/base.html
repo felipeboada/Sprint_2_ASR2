@@ -1,157 +1,491 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        {% block head %}
-        <title>Logística</title>
-        {% endblock %}
-    </head>
-    <body>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-boxes"></i> Sistema de Logística
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="/">
-                                <i class="fas fa-home"></i> Inicio
-                            </a>
-                        </li>
-                        
-                        <!-- Menú para Administradores -->
-                        {% if user.is_admin %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="/productos/">
-                                    <i class="fas fa-box"></i> Productos
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/stock/">
-                                    <i class="fas fa-warehouse"></i> Stock
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/ordercreate/">
-                                    <i class="fas fa-shopping-cart"></i> Crear Pedido
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/admin/">
-                                    <i class="fas fa-cog"></i> Administración
-                                </a>
-                            </li>
-                        
-                        <!-- Menú para Operarios -->
-                        {% elif user.is_operario %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="/productos/">
-                                    <i class="fas fa-box"></i> Productos
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/stock/">
-                                    <i class="fas fa-warehouse"></i> Stock
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/stockcreate/">
-                                    <i class="fas fa-plus-circle"></i> Reabastecer
-                                </a>
-                            </li>
-                        
-                        <!-- Menú para Clientes -->
-                        {% elif user.is_cliente %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="/productos/">
-                                    <i class="fas fa-box"></i> Catálogo
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/ordercreate/">
-                                    <i class="fas fa-shopping-cart"></i> Realizar Pedido
-                                </a>
-                            </li>
-                        {% endif %}
-                    {% endif %}
-                </ul>
-                
-                <!-- Usuario autenticado -->
-                {% if user.is_authenticated %}
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-user-circle"></i> {{ user.username }}
-                                <span class="badge badge-{% if user.is_admin %}danger{% elif user.is_operario %}warning{% else %}info{% endif %}">
-                                    {{ user.get_role_display }}
-                                </span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="/profile/">
-                                    <i class="fas fa-user"></i> Mi Perfil
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="/logout/">
-                                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                                </a>
-                            </div>
-                        </li>
-                    </ul>
-                {% else %}
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/login/">
-                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                            </a>
-                        </li>
-                    </ul>
-                {% endif %}
-            </div>
-        </nav>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    
+    {% block head %}
+    <title>Sistema de Logística</title>
+    {% endblock %}
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
-        <!-- Mensajes de Django -->
-        {% if messages %}
-            <div class="container mt-3">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                {% endfor %}
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Navbar moderna con glassmorphism */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(4px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+            padding: 1rem 2rem;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .navbar-brand:hover {
+            transform: translateY(-2px);
+        }
+        
+        .navbar-brand i {
+            font-size: 1.8rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: left 0.3s ease;
+        }
+        
+        .nav-link:hover::before {
+            left: 0;
+        }
+        
+        .nav-link:hover {
+            color: white !important;
+            transform: translateY(-2px);
+        }
+        
+        .nav-link i {
+            margin-right: 5px;
+        }
+        
+        /* Badges de roles con colores vibrantes */
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .badge-danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .badge-warning {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+        }
+        
+        .badge-info {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+        }
+        
+        /* Dropdown menu mejorado */
+        .dropdown-menu {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 0.5rem 0;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .dropdown-item {
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .dropdown-item:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .dropdown-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Container principal */
+        main {
+            flex: 1;
+            padding: 2rem 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+        }
+        
+        /* Mensajes con animación */
+        .alert {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            animation: slideInDown 0.5s ease;
+            font-weight: 500;
+        }
+        
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #81FBB8 0%, #28C76F 100%);
+            color: white;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, #FF6B9D 0%, #C94B4B 100%);
+            color: white;
+        }
+        
+        .alert-warning {
+            background: linear-gradient(135deg, #FDEB71 0%, #F8D800 100%);
+            color: #333;
+        }
+        
+        .alert-info {
+            background: linear-gradient(135deg, #48c6ef 0%, #6f86d6 100%);
+            color: white;
+        }
+        
+        /* Footer moderno */
+        footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-top: auto;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .footer-left {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .footer-course {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ecf0f1;
+        }
+        
+        .footer-group {
+            font-size: 0.9rem;
+            font-style: italic;
+            color: #bdc3c7;
+        }
+        
+        .footer-right {
+            text-align: right;
+        }
+        
+        .footer-university {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ecf0f1;
+        }
+        
+        .footer-logo {
+            margin-left: 10px;
+            font-size: 1.2rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .footer-right {
+                text-align: center;
+            }
+            
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+        }
+        
+        /* Efectos hover en botones */
+        .btn {
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Scroll suave */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* User badge en navbar */
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar mejorado -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-truck-fast"></i>
+            <span>LogiSmart</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home"></i> Inicio
+                        </a>
+                    </li>
+                    
+                    <!-- Menú para Administradores -->
+                    {% if user.is_admin %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos/">
+                                <i class="fas fa-boxes"></i> Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/stock/">
+                                <i class="fas fa-warehouse"></i> Inventario
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/ordercreate/">
+                                <i class="fas fa-cart-plus"></i> Nuevo Pedido
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin/">
+                                <i class="fas fa-user-shield"></i> Admin Panel
+                            </a>
+                        </li>
+                    
+                    <!-- Menú para Operarios -->
+                    {% elif user.is_operario %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos/">
+                                <i class="fas fa-boxes"></i> Productos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/stock/">
+                                <i class="fas fa-warehouse"></i> Inventario
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/stockcreate/">
+                                <i class="fas fa-box-open"></i> Reabastecer
+                            </a>
+                        </li>
+                    
+                    <!-- Menú para Clientes -->
+                    {% elif user.is_cliente %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/productos/">
+                                <i class="fas fa-store"></i> Catálogo
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/ordercreate/">
+                                <i class="fas fa-shopping-bag"></i> Hacer Pedido
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+            
+            <!-- Usuario autenticado -->
+            {% if user.is_authenticated %}
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle user-badge" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div class="user-avatar">
+                                {{ user.username|first|upper }}
+                            </div>
+                            <span>{{ user.username }}</span>
+                            <span class="badge badge-{% if user.is_admin %}danger{% elif user.is_operario %}warning{% else %}info{% endif %}">
+                                {{ user.get_role_display }}
+                            </span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="/profile/">
+                                <i class="fas fa-user-circle"></i> Mi Perfil
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/logout/">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            {% else %}
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login/">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
+                    </li>
+                </ul>
+            {% endif %}
+        </div>
+    </nav>
+    
+    <!-- Mensajes de Django con animación -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <strong>
+                        {% if message.tags == 'success' %}
+                            <i class="fas fa-check-circle"></i>
+                        {% elif message.tags == 'error' or message.tags == 'danger' %}
+                            <i class="fas fa-exclamation-circle"></i>
+                        {% elif message.tags == 'warning' %}
+                            <i class="fas fa-exclamation-triangle"></i>
+                        {% else %}
+                            <i class="fas fa-info-circle"></i>
+                        {% endif %}
+                    </strong>
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main>
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer moderno -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                <div class="footer-course">
+                    <i class="fas fa-graduation-cap"></i>
+                    ISIS-2503 Arquitectura y Diseño de Software
+                </div>
+                <div class="footer-group">
+                    <i class="fas fa-users"></i>
+                    Grupo 4444
+                </div>
             </div>
-        {% endif %}
-
-        <main>
-          <div class="container" style="min-height: 580px;">
-          {% block content %}
-          {% endblock %}
-          </div>
-        </main>
-
-    </body>
-
-    <!-- Footer -->
-        <footer style="background-color: #D8D8D8; position: relative; bottom: 0; width: 100%; height: 100px;">
-            <div style="padding: 30px">
-                <div style="float: left; width: 400px;" >ISIS-2503 Arquitectura y Diseño de Software</div>
-                <div style="float: right; width: 220px;" >Universidad de los Andes</div>
-                <br>
-                <div style="float: left; width: 400px;" ><i>Grupo 4444</i></div>
+            <div class="footer-right">
+                <div class="footer-university">
+                    Universidad de los Andes
+                    <i class="fas fa-university footer-logo"></i>
+                </div>
             </div>
-            <br>
-        </footer>
-    <!-- Footer -->
+        </div>
+    </footer>
 
+</body>
 </html>
