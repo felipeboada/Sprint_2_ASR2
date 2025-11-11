@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
 <style>
     .form-page {
         animation: fadeIn 0.6s ease;
@@ -17,7 +20,7 @@
         padding: 40px;
         text-align: center;
         color: white;
-        box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);
+        box-shadow: 0 15px 40px rgba(79, 172, 254, 0.3);
         position: relative;
         overflow: hidden;
     }
@@ -72,7 +75,7 @@
         border-radius: 0 0 20px 20px;
         padding: 50px 40px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        max-width: 800px;
+        max-width: 1100px;
         margin: 0 auto;
     }
     
@@ -84,7 +87,7 @@
         color: #2c3e50;
         font-size: 1.5rem;
         font-weight: 600;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         padding-bottom: 10px;
         border-bottom: 3px solid #4facfe;
         display: flex;
@@ -141,39 +144,137 @@
         background: white;
     }
     
-    .location-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
+    /* Ocultar el select original pero mantenerlo funcional */
+    #id_delivery_zone {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
     }
     
-    .location-card {
+    .map-zones-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-top: 20px;
+    }
+    
+    .map-container {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        border: 3px solid #e3f2fd;
+    }
+    
+    #map {
+        width: 100%;
+        height: 450px;
+        border-radius: 15px;
+    }
+    
+    .zones-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .zone-card {
         background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-        border-radius: 12px;
+        border-radius: 15px;
         padding: 20px;
-        border-left: 4px solid #2196f3;
+        border: 3px solid transparent;
         cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .zone-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        transition: left 0.5s;
+    }
+    
+    .zone-card:hover::before {
+        left: 100%;
+    }
+    
+    .zone-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+        border-color: #2196f3;
+    }
+    
+    .zone-card.selected {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        border-color: #0288d1;
+        transform: scale(1.02);
+        box-shadow: 0 10px 30px rgba(79, 172, 254, 0.5);
+    }
+    
+    .zone-card.selected .zone-icon,
+    .zone-card.selected .zone-title,
+    .zone-card.selected .zone-description {
+        color: white !important;
+    }
+    
+    .zone-card.selected .check-icon {
+        opacity: 1;
+    }
+    
+    .zone-content {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .zone-icon {
+        font-size: 2rem;
+        color: #2196f3;
+        transition: all 0.3s ease;
+        min-width: 40px;
+    }
+    
+    .zone-info {
+        flex: 1;
+    }
+    
+    .zone-title {
+        color: #1976d2;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 5px;
         transition: all 0.3s ease;
     }
     
-    .location-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(33, 150, 243, 0.2);
+    .zone-description {
+        color: #1565c0;
+        font-size: 0.85rem;
+        line-height: 1.3;
+        transition: all 0.3s ease;
     }
     
-    .location-card h5 {
-        color: #1976d2;
-        margin: 0 0 10px 0;
-        font-weight: 600;
+    .check-icon {
+        width: 30px;
+        height: 30px;
+        background: white;
+        border-radius: 50%;
         display: flex;
         align-items: center;
-        gap: 8px;
+        justify-content: center;
+        opacity: 0;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
     
-    .location-card p {
-        color: #1565c0;
-        margin: 5px 0;
-        font-size: 0.9rem;
+    .check-icon i {
+        color: #4facfe;
+        font-size: 1rem;
     }
     
     .btn-container {
@@ -261,15 +362,15 @@
     }
     
     .info-card {
-        background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
         border-radius: 12px;
         padding: 20px;
         margin-bottom: 30px;
-        border-left: 4px solid #ffc107;
+        border-left: 4px solid #28a745;
     }
     
     .info-card h4 {
-        color: #856404;
+        color: #155724;
         margin: 0 0 10px 0;
         font-weight: 600;
         display: flex;
@@ -278,9 +379,83 @@
     }
     
     .info-card p {
-        color: #856404;
+        color: #155724;
         margin: 0;
         font-size: 0.95rem;
+    }
+    
+    .map-legend {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .legend-title {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+        font-size: 0.85rem;
+        color: #7f8c8d;
+    }
+    
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    .dot-warehouse {
+        background: #ff6b6b;
+    }
+    
+    .dot-zone {
+        background: #4facfe;
+    }
+    
+    /* Estilos personalizados para los popups de Leaflet */
+    .leaflet-popup-content-wrapper {
+        border-radius: 12px;
+        padding: 5px;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .leaflet-popup-content {
+        margin: 10px;
+        font-size: 0.9rem;
+    }
+    
+    .popup-title {
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 5px;
+        font-size: 1rem;
+    }
+    
+    .popup-coords {
+        color: #7f8c8d;
+        font-size: 0.8rem;
+    }
+    
+    @media (max-width: 968px) {
+        .map-zones-container {
+            grid-template-columns: 1fr;
+        }
+        
+        #map {
+            height: 350px;
+        }
     }
     
     @media (max-width: 768px) {
@@ -296,10 +471,6 @@
             padding: 30px 20px;
         }
         
-        .location-grid {
-            grid-template-columns: 1fr;
-        }
-        
         .btn-container {
             flex-direction: column;
         }
@@ -312,24 +483,24 @@
 </style>
 
 <div class="form-page">
-    <div style="max-width: 900px; margin: 30px auto;">
+    <div style="max-width: 1200px; margin: 30px auto;">
         <div class="form-header">
             <div class="header-content">
                 <div class="header-icon">
                     <i class="fas fa-shopping-cart"></i>
                 </div>
                 <h2>Crear Nuevo Pedido</h2>
-                <p>Solicita productos de nuestro inventario</p>
+                <p>Solicita productos de nuestro inventario con entrega desde la bodega más cercana</p>
             </div>
         </div>
         
         <div class="form-body">
             <div class="info-card">
                 <h4>
-                    <i class="fas fa-lightbulb"></i>
-                    Proceso Automático
+                    <i class="fas fa-truck"></i>
+                    Entrega Inteligente
                 </h4>
-                <p>El sistema asignará automáticamente la bodega más cercana a tu ubicación con stock disponible.</p>
+                <p>Selecciona tu zona de entrega y el sistema asignará automáticamente la bodega más cercana con stock disponible.</p>
             </div>
             
             <form method="POST">
@@ -342,10 +513,10 @@
                     </div>
                     
                     {% for field in form %}
-                        {% if 'product' in field.name or 'variable' in field.name or 'quantity' in field.name or 'units' in field.name %}
+                        {% if 'variable' in field.name or 'units' in field.name %}
                         <div class="form-group">
                             <label for="{{ field.id_for_label }}">
-                                {% if 'product' in field.name or 'variable' in field.name %}
+                                {% if 'variable' in field.name %}
                                     <i class="fas fa-cube"></i>
                                 {% else %}
                                     <i class="fas fa-calculator"></i>
@@ -371,55 +542,120 @@
                 
                 <div class="form-section">
                     <div class="section-title">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Ubicación de Entrega</span>
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Zona de Entrega y Ubicación de Bodegas</span>
                     </div>
                     
-                    <div class="location-grid">
-                        <div class="location-card" onclick="setLocation(4.710989, -74.072092)">
-                            <h5><i class="fas fa-map-pin"></i> Zona Norte</h5>
-                            <p><strong>Latitud:</strong> 4.710989</p>
-                            <p><strong>Longitud:</strong> -74.072092</p>
-                        </div>
-                        <div class="location-card" onclick="setLocation(4.598889, -74.080833)">
-                            <h5><i class="fas fa-map-pin"></i> Zona Centro</h5>
-                            <p><strong>Latitud:</strong> 4.598889</p>
-                            <p><strong>Longitud:</strong> -74.080833</p>
-                        </div>
-                        <div class="location-card" onclick="setLocation(4.570868, -74.297333)">
-                            <h5><i class="fas fa-map-pin"></i> Zona Sur</h5>
-                            <p><strong>Latitud:</strong> 4.570868</p>
-                            <p><strong>Longitud:</strong> -74.297333</p>
-                        </div>
-                        <div class="location-card" onclick="setLocation(4.650000, -74.100000)">
-                            <h5><i class="fas fa-map-pin"></i> Personalizado</h5>
-                            <p>Ingresa tus propias coordenadas</p>
-                        </div>
-                    </div>
+                    <!-- Campo select oculto pero funcional -->
+                    {% for field in form %}
+                        {% if 'delivery_zone' in field.name %}
+                            {{ field }}
+                        {% endif %}
+                    {% endfor %}
                     
-                    <div class="location-grid" style="margin-top: 20px;">
-                        {% for field in form %}
-                            {% if 'lat' in field.name or 'lon' in field.name %}
-                            <div class="form-group">
-                                <label for="{{ field.id_for_label }}">
-                                    <i class="fas fa-map-marked-alt"></i>
-                                    {{ field.label }}
-                                </label>
-                                {{ field }}
-                                {% if field.help_text %}
-                                <div class="helper-text">
-                                    <i class="fas fa-info-circle"></i>
-                                    {{ field.help_text }}
-                                </div>
-                                {% endif %}
-                                {% if field.errors %}
-                                <div class="alert alert-danger mt-2">
-                                    {{ field.errors }}
-                                </div>
-                                {% endif %}
+                    <div class="map-zones-container">
+                        <!-- Mapa Leaflet -->
+                        <div>
+                            <div class="map-container">
+                                <div id="map"></div>
                             </div>
-                            {% endif %}
-                        {% endfor %}
+                            <div class="map-legend">
+                                <div class="legend-title">
+                                    <i class="fas fa-info-circle"></i> Leyenda
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot dot-warehouse"></div>
+                                    <span>Bodegas (3 ubicaciones)</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot dot-zone"></div>
+                                    <span>Zona de entrega seleccionada</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Selector de zonas -->
+                        <div class="zones-container">
+                            <p style="color: #7f8c8d; margin-bottom: 15px; font-size: 0.95rem;">
+                                <i class="fas fa-hand-pointer"></i>
+                                <strong>Selecciona tu zona de entrega:</strong>
+                            </p>
+                            
+                            <div class="zone-card" onclick="selectZone('norte', this, 4.710989, -74.072092)" data-zone="norte">
+                                <div class="zone-content">
+                                    <div class="zone-icon">
+                                        <i class="fas fa-map-pin"></i>
+                                    </div>
+                                    <div class="zone-info">
+                                        <div class="zone-title">Zona Norte</div>
+                                        <div class="zone-description">Usaquén, Chapinero, Suba</div>
+                                    </div>
+                                    <div class="check-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="zone-card selected" onclick="selectZone('centro', this, 4.598889, -74.080833)" data-zone="centro">
+                                <div class="zone-content">
+                                    <div class="zone-icon">
+                                        <i class="fas fa-map-pin"></i>
+                                    </div>
+                                    <div class="zone-info">
+                                        <div class="zone-title">Zona Centro</div>
+                                        <div class="zone-description">Teusaquillo, Santa Fe, Candelaria</div>
+                                    </div>
+                                    <div class="check-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="zone-card" onclick="selectZone('sur', this, 4.570868, -74.297333)" data-zone="sur">
+                                <div class="zone-content">
+                                    <div class="zone-icon">
+                                        <i class="fas fa-map-pin"></i>
+                                    </div>
+                                    <div class="zone-info">
+                                        <div class="zone-title">Zona Sur</div>
+                                        <div class="zone-description">Kennedy, Bosa, Tunjuelito</div>
+                                    </div>
+                                    <div class="check-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="zone-card" onclick="selectZone('occidente', this, 4.680389, -74.146667)" data-zone="occidente">
+                                <div class="zone-content">
+                                    <div class="zone-icon">
+                                        <i class="fas fa-map-pin"></i>
+                                    </div>
+                                    <div class="zone-info">
+                                        <div class="zone-title">Zona Occidente</div>
+                                        <div class="zone-description">Fontibón, Engativá</div>
+                                    </div>
+                                    <div class="check-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="zone-card" onclick="selectZone('oriente', this, 4.567778, -74.086111)" data-zone="oriente">
+                                <div class="zone-content">
+                                    <div class="zone-icon">
+                                        <i class="fas fa-map-pin"></i>
+                                    </div>
+                                    <div class="zone-info">
+                                        <div class="zone-title">Zona Oriente</div>
+                                        <div class="zone-description">San Cristóbal, Usme</div>
+                                    </div>
+                                    <div class="check-icon">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -438,29 +674,144 @@
     </div>
 </div>
 
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
-function setLocation(lat, lon) {
-    // Buscar los campos de latitud y longitud por diferentes posibles nombres
-    const latFields = ['id_user_lat', 'id_lat', 'id_latitude'];
-    const lonFields = ['id_user_lon', 'id_lon', 'id_longitude'];
+let map;
+let warehouseMarkers = [];
+let selectedZoneMarker = null;
+let selectedZoneCircle = null;
+
+// Ubicaciones de las bodegas
+const warehouses = [
+    { name: 'Bodega Norte', lat: 4.710989, lng: -74.072092 },
+    { name: 'Bodega Centro', lat: 4.598889, lng: -74.080833 },
+    { name: 'Bodega Sur', lat: 4.570868, lng: -74.297333 }
+];
+
+// Inicializar el mapa
+function initMap() {
+    // Crear el mapa centrado en Bogotá
+    map = L.map('map').setView([4.640, -74.080], 11);
     
-    for (const fieldId of latFields) {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            field.value = lat;
-            field.focus();
-            break;
-        }
+    // Agregar capa de tiles de OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 18
+    }).addTo(map);
+    
+    // Agregar marcadores de bodegas
+    warehouses.forEach(warehouse => {
+        const warehouseIcon = L.divIcon({
+            html: '<div style="background: #ff6b6b; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px;"><i class="fas fa-warehouse"></i></div>',
+            className: 'custom-warehouse-icon',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+        
+        const marker = L.marker([warehouse.lat, warehouse.lng], { icon: warehouseIcon }).addTo(map);
+        
+        marker.bindPopup(`
+            <div class="popup-title">
+                <i class="fas fa-warehouse" style="color: #ff6b6b; margin-right: 5px;"></i>
+                ${warehouse.name}
+            </div>
+            <div class="popup-coords">
+                📍 ${warehouse.lat.toFixed(6)}, ${warehouse.lng.toFixed(6)}
+            </div>
+        `);
+        
+        warehouseMarkers.push(marker);
+    });
+    
+    // Marcar la zona centro por defecto
+    updateZoneMarker(4.598889, -74.080833, 'Zona Centro');
+}
+
+function updateZoneMarker(lat, lng, zoneName) {
+    // Eliminar marcador y círculo anteriores si existen
+    if (selectedZoneMarker) {
+        map.removeLayer(selectedZoneMarker);
+    }
+    if (selectedZoneCircle) {
+        map.removeLayer(selectedZoneCircle);
     }
     
-    for (const fieldId of lonFields) {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            field.value = lon;
-            break;
-        }
+    // Crear círculo de área de cobertura
+    selectedZoneCircle = L.circle([lat, lng], {
+        color: '#4facfe',
+        fillColor: '#4facfe',
+        fillOpacity: 0.15,
+        radius: 3000 // 3km de radio
+    }).addTo(map);
+    
+    // Crear nuevo marcador para la zona seleccionada
+    const zoneIcon = L.divIcon({
+        html: '<div style="background: #4facfe; width: 40px; height: 40px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 15px rgba(79, 172, 254, 0.5); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; animation: bounce 0.5s;"><i class="fas fa-map-pin"></i></div>',
+        className: 'custom-zone-icon',
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+    });
+    
+    selectedZoneMarker = L.marker([lat, lng], { icon: zoneIcon }).addTo(map);
+    
+    selectedZoneMarker.bindPopup(`
+        <div class="popup-title">
+            <i class="fas fa-map-pin" style="color: #4facfe; margin-right: 5px;"></i>
+            ${zoneName}
+        </div>
+        <div class="popup-coords">
+            📍 Tu zona de entrega seleccionada
+        </div>
+    `).openPopup();
+    
+    // Centrar el mapa en la zona seleccionada con animación
+    map.flyTo([lat, lng], 12, {
+        duration: 1.5
+    });
+}
+
+function selectZone(zoneValue, cardElement, lat, lng) {
+    // Remover selección de todas las cards
+    document.querySelectorAll('.zone-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Agregar selección a la card clickeada
+    cardElement.classList.add('selected');
+    
+    // Actualizar el valor del select oculto
+    const selectElement = document.getElementById('id_delivery_zone');
+    if (selectElement) {
+        selectElement.value = zoneValue;
+    }
+    
+    // Obtener el nombre de la zona
+    const zoneName = cardElement.querySelector('.zone-title').textContent;
+    
+    // Actualizar el marcador en el mapa
+    if (map) {
+        updateZoneMarker(lat, lng, zoneName);
     }
 }
+
+// Inicializar el mapa cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    initMap();
+    
+    // Sincronizar la selección visual con el valor del select
+    const selectElement = document.getElementById('id_delivery_zone');
+    if (selectElement && selectElement.value) {
+        const selectedCard = document.querySelector(`.zone-card[data-zone="${selectElement.value}"]`);
+        if (selectedCard) {
+            document.querySelectorAll('.zone-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            selectedCard.classList.add('selected');
+        }
+    }
+});
 </script>
 
 {% endblock %}
