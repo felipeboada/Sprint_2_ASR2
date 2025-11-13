@@ -100,15 +100,20 @@
         font-size: 1.1rem;
         font-weight: 600;
         margin-top: 10px;
-        {% if user.is_admin %}
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .profile-role.admin {
         background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        {% elif user.is_operario %}
+    }
+    
+    .profile-role.operario {
         background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
-        {% else %}
+    }
+    
+    .profile-role.cliente {
         background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
         color: #333;
-        {% endif %}
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
     
     .info-grid {
@@ -293,7 +298,7 @@
                 <div class="status-badge"></div>
             </div>
             <h1 class="profile-name">{{ user.get_full_name|default:user.username }}</h1>
-            <div class="profile-role">
+            <div class="profile-role {% if user.is_admin %}admin{% elif user.is_operario %}operario{% else %}cliente{% endif %}">
                 <i class="fas fa-shield-alt"></i>
                 {{ user.get_role_display }}
             </div>
